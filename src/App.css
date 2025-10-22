@@ -19,6 +19,7 @@ body {
   background: #f7f7f7;
   height: 100vh;
   margin: 0 auto;
+  padding-bottom: 200px;
 }
 
 .city {
@@ -83,4 +84,228 @@ body {
 
 .active p {
   color: #fff;
+}
+
+.documents-section {
+  padding: 16px 16px;
+}
+
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.doc {
+  background: #fff;
+  border-radius: 16px;
+  padding: 0 0 20px 0;
+  overflow: hidden;
+}
+
+.docname {
+  font-family: seedbd;
+  margin: 8px 16px;
+  font-size: 20px;
+}
+
+.price-calculation {
+  font-family: seedrg;
+  margin: 0 16px 16px 16px;
+  font-size: 14px;
+  color: #ff4000;
+  font-weight: bold;
+}
+
+.doc img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Стили для фильтров авто */
+.auto-filters {
+  padding: 16px;
+  background: #fff;
+  margin: 8px 12px;
+  border-radius: 16px;
+}
+
+/* Календарь */
+.calendar-section {
+  margin-bottom: 16px;
+}
+
+.date-pickers {
+  display: flex;
+  gap: 12px;
+  width: calc(100% - 24px);
+}
+
+.date-picker-group label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  font-family: seedrg;
+}
+
+.date-picker {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: seedrg;
+  font-size: 14px;
+  background: #fff;
+}
+
+.date-picker:focus {
+  outline: none;
+  border-color: #ff4000;
+}
+
+/* Фильтр по цене */
+.price-filter {
+  margin-bottom: 16px;
+}
+
+.price-inputs {
+  display: flex;
+  gap: 12px;
+  width: calc(100% - 24px);
+}
+
+.price-input-group label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  font-family: seedrg;
+}
+
+.price-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: seedrg;
+  font-size: 14px;
+  background: #fff;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #ff4000;
+}
+
+/* Фильтр по типу автомобиля */
+.car-type-filter {
+  margin-bottom: 0;
+}
+
+.car-type-options {
+  display: flex;
+  gap: 8px;
+}
+
+.car-type-option {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.car-type-option:hover {
+  border-color: #ff4000;
+}
+
+.car-type-option.active {
+  background: #ff4000;
+  border-color: #ff4000;
+}
+
+.car-type-option p {
+  margin: 0;
+  font-family: seedrg;
+  font-size: 14px;
+  color: #000;
+}
+
+.car-type-option.active p {
+  color: #fff;
+}
+
+/* Стили для react-datepicker */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: seedrg;
+  font-size: 14px;
+  background: #fff;
+}
+
+.react-datepicker__input-container input:focus {
+  outline: none;
+  border-color: #ff4000;
+}
+
+.react-datepicker {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: seedrg;
+}
+
+.react-datepicker__header {
+  background: #ff4000;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 8px 8px 0 0;
+}
+
+.react-datepicker__current-month {
+  color: #fff;
+  font-weight: bold;
+}
+
+.react-datepicker__day-name {
+  color: #fff;
+}
+
+.react-datepicker__day--selected {
+  background: #ff4000;
+  color: #fff;
+}
+
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range {
+  background: #ff4000;
+  color: #fff;
+}
+
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background: #ff4000;
+  color: #fff;
+}
+
+.bron {
+  background: #ff4000;
+  color: #fff;
+  margin: 8px 16px 12px 16px;
+  padding: 9px 16px;
+  border-radius: 4px;
 }
