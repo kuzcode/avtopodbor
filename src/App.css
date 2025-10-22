@@ -17,7 +17,7 @@ body {
 .App {
   max-width: 450px;
   background: #f7f7f7;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0 auto;
   padding-bottom: 200px;
 }
@@ -305,7 +305,11 @@ body {
 .bron {
   background: #ff4000;
   color: #fff;
-  margin: 8px 16px 12px 16px;
+  margin: 8px 0px 12px 16px;
   padding: 9px 16px;
   border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: seedrg;
+  font-size: 14px;
 }

@@ -213,6 +213,7 @@ function App() {
             <img
               src={pin}
               className='pin'
+              alt="Местоположение"
             />
           <p>{city.name}</p>
         </button>
@@ -249,6 +250,7 @@ function App() {
           >
             <img
               src={icons[index]}
+              alt={t.name}
               style={type === t.name ? { filter: 'brightness(0) invert(1)' } : {}}
             />
             <p>{t.name}</p>
@@ -355,23 +357,31 @@ function App() {
                 <div
                   key={doc.$id || index}
                   className='doc'
-                  onClick={() => {
-                    const t = parseInt(doc.type);
-                    const paths = ['auto', 'moto', 'realty', 'tour'];
-                    const base = paths[t] || 'auto';
-                    navigate(`/${base}/${doc.$id}`);
-                  }}
+                onClick={() => {
+                  const t = parseInt(doc.type);
+                  const paths = ['auto', 'moto', 'realty', 'tour'];
+                  const base = paths[t] || 'auto';
+                  
+                  // Передаем даты через URL параметры
+                  const params = new URLSearchParams();
+                  if (startDate) params.append('startDate', startDate.toISOString());
+                  if (endDate) params.append('endDate', endDate.toISOString());
+                  
+                  const queryString = params.toString();
+                  const url = `/${base}/${doc.$id}${queryString ? `?${queryString}` : ''}`;
+                  navigate(url);
+                }}
                   style={{ cursor: 'pointer' }}
                 >
-                  <img src={doc.img} />
+                  <img src={doc.img} alt={doc.name} />
                   <p className='docname'>{doc.name}</p>
                   {type === 'Авто' && doc.price && days > 0 && totalPrice && (
                     <p className='price-calculation'>
-                      {parseFloat(doc.price).toLocaleString('ru-RU')}₽ × {days} суток = {totalPrice.toLocaleString('ru-RU')}₽
+                      {parseFloat(doc.price).toLocaleString('ru-RU')}₽ × {days} сут. = {totalPrice.toLocaleString('ru-RU')}₽
                     </p>
                   )}
 
-                  <a className='bron'>Забронировать</a>
+                  <button className='bron'>Забронировать</button>
                 </div>
               );
             })}
