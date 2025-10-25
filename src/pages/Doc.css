@@ -1,3 +1,102 @@
 .linkback {
-    color: #ff4000;
+    color: #1c6bd3;
+}
+
+/* Стили для выбора периода недвижимости */
+.period-options {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.period-option {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    text-align: center;
+}
+
+.period-option:hover {
+    border-color: #1c6bd3;
+}
+
+.period-option.active {
+    background: #1c6bd3;
+    border-color: #1c6bd3;
+    color: white;
+}
+
+.period-option p {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Стили для фильтра класса недвижимости */
+.home-class-options {
+    display: flex;
+    gap: 8px;
+}
+
+.home-class-option {
+    flex: 1;
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    text-align: center;
+}
+
+.home-class-option:hover {
+    border-color: #1c6bd3;
+}
+
+.home-class-option.active {
+    background: #1c6bd3;
+    border-color: #1c6bd3;
+    color: white;
+}
+
+.home-class-option p {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Стили для фильтра типа экскурсии */
+.tour-type-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tour-type-option {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    text-align: center;
+}
+
+.tour-type-option:hover {
+    border-color: #1c6bd3;
+}
+
+.tour-type-option.active {
+    background: #1c6bd3;
+    border-color: #1c6bd3;
+    color: white;
+}
+
+.tour-type-option p {
+    margin: 0;
+    font-weight: 500;
 }

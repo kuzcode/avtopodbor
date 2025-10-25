@@ -18,11 +18,8 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const cities = [
-    { name: 'Москва', value: 0 },
-    { name: 'СПБ', value: 1 },
-    { name: 'Новосибирск', value: 2 },
-    { name: 'Екатеринбург', value: 3 },
-    { name: 'Казань', value: 4 }
+    { name: 'Пхукет', value: 0 },
+    { name: 'Паттайя', value: 1 },
   ];
   const types = [
     { name: 'Авто', icon: 'car', value: 0 },
@@ -47,6 +44,13 @@ function App() {
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
   const [carType, setCarType] = useState(''); // '' - все, 'sedan' - седан, 'crossover' - кроссовер
+  
+  // Состояния для недвижимости
+  const [realtyPeriod, setRealtyPeriod] = useState(''); // '' - не выбрано, 'calendar' - календарь, '6months' - 6 месяцев, 'year' - год
+  const [homeClass, setHomeClass] = useState(''); // '' - все, 'standard' - стандарт, 'max' - макси
+  
+  // Состояния для экскурсий
+  const [tourType, setTourType] = useState(''); // '' - все, 'islands' - острова, 'quadro' - квадро, 'hydro' - гидроциклы, 'enduro' - эндуро
   
   // Функция для расчета количества дней между датами
   const calculateDays = () => {
@@ -73,7 +77,7 @@ function App() {
         [
           Query.equal('type', [typeValue]),
           Query.equal('city', [cityValue]),
-          Query.select(['$id', 'name', 'city', 'type', 'img', 'price', 'carType'])
+          Query.select(['$id', 'name', 'city', 'type', 'img', 'price', 'carType', 'homeClass', 'tourType'])
         ]
       );
       return response.documents;
@@ -91,7 +95,7 @@ function App() {
         COLLECTION_ID,
         [
           Query.equal('city', [cityValue]),
-          Query.select(['$id', 'name', 'city', 'type', 'img', 'price', 'carType'])
+          Query.select(['$id', 'name', 'city', 'type', 'img', 'price', 'carType', 'homeClass', 'tourType'])
         ]
       );
       return response.documents;
@@ -147,9 +151,9 @@ function App() {
       const selectedCityValue = city.value;
       const cityMatch = docCity === selectedCityValue;
       
-      // Проверяем цену (только для авто)
+      // Проверяем цену (для авто, мотоциклов, недвижимости и экскурсий)
       let priceMatch = true;
-      if (type === 'Авто' && doc.price !== undefined && doc.price !== null) {
+      if ((type === 'Авто' || type === 'Мото' || type === 'Недвижимость' || type === 'Экскурсия') && doc.price !== undefined && doc.price !== null) {
         const docPrice = parseFloat(doc.price);
         if (priceFrom && !isNaN(parseFloat(priceFrom)) && docPrice < parseFloat(priceFrom)) priceMatch = false;
         if (priceTo && !isNaN(parseFloat(priceTo)) && docPrice > parseFloat(priceTo)) priceMatch = false;
@@ -163,21 +167,46 @@ function App() {
         if (carType === 'crossover' && docCarType !== 1) carTypeMatch = false;
       }
       
-      const finalMatch = typeMatch && cityMatch && priceMatch && carTypeMatch;
+      // Проверяем класс недвижимости (только для недвижимости)
+      let homeClassMatch = true;
+      if (type === 'Недвижимость' && homeClass && doc.homeClass !== undefined && doc.homeClass !== null) {
+        const docHomeClass = parseInt(doc.homeClass);
+        if (homeClass === 'standard' && docHomeClass !== 0) homeClassMatch = false;
+        if (homeClass === 'max' && docHomeClass !== 1) homeClassMatch = false;
+      }
+      
+      // Проверяем тип экскурсии (только для экскурсий)
+      let tourTypeMatch = true;
+      if (type === 'Экскурсия' && tourType && doc.tourType !== undefined && doc.tourType !== null) {
+        const docTourType = parseInt(doc.tourType);
+        if (tourType === 'islands' && docTourType !== 0) tourTypeMatch = false;
+        if (tourType === 'quadro' && docTourType !== 1) tourTypeMatch = false;
+        if (tourType === 'hydro' && docTourType !== 2) tourTypeMatch = false;
+        if (tourType === 'enduro' && docTourType !== 3) tourTypeMatch = false;
+      }
+      
+      const finalMatch = typeMatch && cityMatch && priceMatch && carTypeMatch && homeClassMatch && tourTypeMatch;
       
       // Отладочная информация
-      if (type === 'Авто') {
+      if (type === 'Авто' || type === 'Мото' || type === 'Недвижимость' || type === 'Экскурсия') {
         console.log('Фильтрация документа:', {
           docName: doc.name,
           docPrice: doc.price,
           docCarType: doc.carType,
+          docHomeClass: doc.homeClass,
+          docTourType: doc.tourType,
           priceFrom: priceFrom,
           priceTo: priceTo,
           carType: carType,
+          homeClass: homeClass,
+          tourType: tourType,
+          realtyPeriod: realtyPeriod,
           typeMatch: typeMatch,
           cityMatch: cityMatch,
           priceMatch: priceMatch,
           carTypeMatch: carTypeMatch,
+          homeClassMatch: homeClassMatch,
+          tourTypeMatch: tourTypeMatch,
           finalMatch: finalMatch
         });
       }
@@ -228,7 +257,7 @@ function App() {
                 }}
                 style={{
                   padding: '6px 20px 6px 12px',
-                  background: c.name === city.name ? '#ff4000' : 'transparent',
+                  background: c.name === city.name ? '#1c6bd3' : 'transparent',
                   color: c.name === city.name ? '#fff' : '#000'
                 }}
               >
@@ -298,7 +327,7 @@ function App() {
           <div className="price-filter">
             <div className="price-inputs">
               <div className="price-input-group">
-                <label>Цена от (₽/сутки)</label>
+                <label>Цена от (฿/сутки)</label>
                 <input
                   type="number"
                   value={priceFrom}
@@ -308,7 +337,7 @@ function App() {
                 />
               </div>
               <div className="price-input-group">
-                <label>Цена до (₽/сутки)</label>
+                <label>Цена до (฿/сутки)</label>
                 <input
                   type="number"
                   value={priceTo}
@@ -334,6 +363,240 @@ function App() {
                 onClick={() => setCarType(carType === 'crossover' ? '' : 'crossover')}
               >
                 <p>Кроссовер</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Календарь и фильтры для мотоциклов */}
+      {type === 'Мото' && (
+        <div className="auto-filters">
+          {/* Календарь */}
+          <div className="calendar-section">
+            <div className="date-pickers">
+              <div className="date-picker-group">
+                <label>Начало аренды</label>
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  selectsStart
+                  startDate={startDate}
+                  endDate={endDate}
+                  placeholderText="Выберите дату"
+                  className="date-picker"
+                  dateFormat="dd.MM.yyyy"
+                />
+              </div>
+              <div className="date-picker-group">
+                <label>Конец аренды</label>
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  selectsEnd
+                  startDate={startDate}
+                  endDate={endDate}
+                  minDate={startDate}
+                  placeholderText="Выберите дату"
+                  className="date-picker"
+                  dateFormat="dd.MM.yyyy"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Фильтр по цене */}
+          <div className="price-filter">
+            <div className="price-inputs">
+              <div className="price-input-group">
+                <label>Цена от (฿/сутки)</label>
+                <input
+                  type="number"
+                  value={priceFrom}
+                  onChange={(e) => setPriceFrom(e.target.value)}
+                  placeholder="0"
+                  className="price-input"
+                />
+              </div>
+              <div className="price-input-group">
+                <label>Цена до (฿/сутки)</label>
+                <input
+                  type="number"
+                  value={priceTo}
+                  onChange={(e) => setPriceTo(e.target.value)}
+                  placeholder="10000"
+                  className="price-input"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Фильтры для недвижимости */}
+      {type === 'Недвижимость' && (
+        <div className="auto-filters">
+          {/* Выбор периода аренды */}
+          <div className="realty-period-section">
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Период аренды</h3>
+            <div className="period-options">
+              <div
+                className={`period-option ${realtyPeriod === 'calendar' ? 'active' : ''}`}
+                onClick={() => setRealtyPeriod(realtyPeriod === 'calendar' ? '' : 'calendar')}
+              >
+                <p>Выбрать</p>
+              </div>
+              <div
+                className={`period-option ${realtyPeriod === '6months' ? 'active' : ''}`}
+                onClick={() => setRealtyPeriod(realtyPeriod === '6months' ? '' : '6months')}
+              >
+                <p>6 месяцев</p>
+              </div>
+              <div
+                className={`period-option ${realtyPeriod === 'year' ? 'active' : ''}`}
+                onClick={() => setRealtyPeriod(realtyPeriod === 'year' ? '' : 'year')}
+              >
+                <p>Год</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Календарь (показывается только если выбран "календарь") */}
+          {realtyPeriod === 'calendar' && (
+            <div className="calendar-section">
+              <div className="date-pickers">
+                <div className="date-picker-group">
+                  <label>Начало аренды</label>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    selectsStart
+                    startDate={startDate}
+                    endDate={endDate}
+                    placeholderText="Выберите дату"
+                    className="date-picker"
+                    dateFormat="dd.MM.yyyy"
+                  />
+                </div>
+                <div className="date-picker-group">
+                  <label>Конец аренды</label>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    selectsEnd
+                    startDate={startDate}
+                    endDate={endDate}
+                    minDate={startDate}
+                    placeholderText="Выберите дату"
+                    className="date-picker"
+                    dateFormat="dd.MM.yyyy"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Фильтр по цене */}
+          <div className="price-filter">
+            <div className="price-inputs">
+              <div className="price-input-group">
+                <label>Цена от (฿/месяц)</label>
+                <input
+                  type="number"
+                  value={priceFrom}
+                  onChange={(e) => setPriceFrom(e.target.value)}
+                  placeholder="0"
+                  className="price-input"
+                />
+              </div>
+              <div className="price-input-group">
+                <label>Цена до (฿/месяц)</label>
+                <input
+                  type="number"
+                  value={priceTo}
+                  onChange={(e) => setPriceTo(e.target.value)}
+                  placeholder="100000"
+                  className="price-input"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Фильтр по классу недвижимости */}
+          <div className="home-class-filter">
+            <div className="home-class-options">
+              <div
+                className={`home-class-option ${homeClass === 'standard' ? 'active' : ''}`}
+                onClick={() => setHomeClass(homeClass === 'standard' ? '' : 'standard')}
+              >
+                <p>Стандарт</p>
+              </div>
+              <div
+                className={`home-class-option ${homeClass === 'max' ? 'active' : ''}`}
+                onClick={() => setHomeClass(homeClass === 'max' ? '' : 'max')}
+              >
+                <p>Макси</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Фильтры для экскурсий */}
+      {type === 'Экскурсия' && (
+        <div className="auto-filters">
+          {/* Фильтр по цене */}
+          <div className="price-filter">
+            <div className="price-inputs">
+              <div className="price-input-group">
+                <label>Цена от (฿/человек)</label>
+                <input
+                  type="number"
+                  value={priceFrom}
+                  onChange={(e) => setPriceFrom(e.target.value)}
+                  placeholder="0"
+                  className="price-input"
+                />
+              </div>
+              <div className="price-input-group">
+                <label>Цена до (฿/человек)</label>
+                <input
+                  type="number"
+                  value={priceTo}
+                  onChange={(e) => setPriceTo(e.target.value)}
+                  placeholder="10000"
+                  className="price-input"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Фильтр по типу экскурсии */}
+          <div className="tour-type-filter">
+            <div className="tour-type-options">
+              <div
+                className={`tour-type-option ${tourType === 'islands' ? 'active' : ''}`}
+                onClick={() => setTourType(tourType === 'islands' ? '' : 'islands')}
+              >
+                <p>Острова</p>
+              </div>
+              <div
+                className={`tour-type-option ${tourType === 'quadro' ? 'active' : ''}`}
+                onClick={() => setTourType(tourType === 'quadro' ? '' : 'quadro')}
+              >
+                <p>Квадро</p>
+              </div>
+              <div
+                className={`tour-type-option ${tourType === 'hydro' ? 'active' : ''}`}
+                onClick={() => setTourType(tourType === 'hydro' ? '' : 'hydro')}
+              >
+                <p>Гидроциклы</p>
+              </div>
+              <div
+                className={`tour-type-option ${tourType === 'enduro' ? 'active' : ''}`}
+                onClick={() => setTourType(tourType === 'enduro' ? '' : 'enduro')}
+              >
+                <p>Эндуро</p>
               </div>
             </div>
           </div>
@@ -367,6 +630,11 @@ function App() {
                   if (startDate) params.append('startDate', startDate.toISOString());
                   if (endDate) params.append('endDate', endDate.toISOString());
                   
+                  // Для недвижимости передаем выбранный период
+                  if (type === 'Недвижимость' && realtyPeriod) {
+                    params.append('realtyPeriod', realtyPeriod);
+                  }
+                  
                   const queryString = params.toString();
                   const url = `/${base}/${doc.$id}${queryString ? `?${queryString}` : ''}`;
                   navigate(url);
@@ -375,13 +643,31 @@ function App() {
                 >
                   <img src={doc.img} alt={doc.name} />
                   <p className='docname'>{doc.name}</p>
-                  {type === 'Авто' && doc.price && days > 0 && totalPrice && (
+                  {(type === 'Авто' || type === 'Мото') && doc.price && days > 0 && totalPrice && (
                     <p className='price-calculation'>
-                      {parseFloat(doc.price).toLocaleString('ru-RU')}₽ × {days} сут. = {totalPrice.toLocaleString('ru-RU')}₽
+                      {parseFloat(doc.price).toLocaleString('ru-RU')}฿ × {days} сут. = {totalPrice.toLocaleString('ru-RU')}฿
+                    </p>
+                  )}
+                  {type === 'Недвижимость' && doc.price && realtyPeriod && (
+                    <p className='price-calculation'>
+                      {realtyPeriod === 'calendar' && days > 0 ? (
+                        `${parseFloat(doc.price).toLocaleString('ru-RU')}฿ × ${days} сут. = ${(parseFloat(doc.price) * days / 30).toLocaleString('ru-RU')}฿`
+                      ) : realtyPeriod === '6months' ? (
+                        `${parseFloat(doc.price).toLocaleString('ru-RU')}฿ × 6 мес. = ${(parseFloat(doc.price) * 6).toLocaleString('ru-RU')}฿`
+                      ) : realtyPeriod === 'year' ? (
+                        `${parseFloat(doc.price).toLocaleString('ru-RU')}฿ × 12 мес. = ${(parseFloat(doc.price) * 12).toLocaleString('ru-RU')}฿`
+                      ) : null}
+                    </p>
+                  )}
+                  {type === 'Экскурсия' && doc.price && (
+                    <p className='price-calculation'>
+                      {parseFloat(doc.price).toLocaleString('ru-RU')}฿/человек
                     </p>
                   )}
 
-                  <button className='bron'>Забронировать</button>
+                  <button className='bron'>
+                    {type === 'Недвижимость' ? 'Записаться на просмотр' : 'Забронировать'}
+                  </button>
                 </div>
               );
             })}

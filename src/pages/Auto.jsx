@@ -118,7 +118,7 @@ export default function AutoPage() {
               margin: 0,
               fontWeight: 'bold'
             }}>
-              {parseFloat(doc.price).toLocaleString('ru-RU')}₽ × {days} сут. = {totalPrice.toLocaleString('ru-RU')}₽
+              {parseFloat(doc.price).toLocaleString('ru-RU')}฿ × {days} сут. = {totalPrice.toLocaleString('ru-RU')}฿
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -129,7 +129,7 @@ export default function AutoPage() {
               onClick={() => {
                 const botToken = "8221206378:AAEcA2xJvfokMJy8gBrWpqiMn4gXsRpjCHw";
                 const chatId = "5864245473";
-                const message = `Заявка на аренду: ${doc.name}\nПериод: ${startDate?.toLocaleDateString('ru-RU')} - ${endDate?.toLocaleDateString('ru-RU')}\nСтоимость: ${totalPrice.toLocaleString('ru-RU')}₽\nКомментарий: ${comment}`;
+                const message = `Заявка на аренду: ${doc.name}\nПериод: ${startDate?.toLocaleDateString('ru-RU')} - ${endDate?.toLocaleDateString('ru-RU')}\nСтоимость: ${totalPrice.toLocaleString('ru-RU')}฿\nКомментарий: ${comment}`;
                 const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
                 fetch(url)
                   .then(response => response.json())
