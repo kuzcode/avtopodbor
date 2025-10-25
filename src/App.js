@@ -450,7 +450,7 @@ function App() {
                 className={`period-option ${realtyPeriod === '6months' ? 'active' : ''}`}
                 onClick={() => setRealtyPeriod(realtyPeriod === '6months' ? '' : '6months')}
               >
-                <p>6 месяцев</p>
+                <p>6 мес.</p>
               </div>
               <div
                 className={`period-option ${realtyPeriod === 'year' ? 'active' : ''}`}
