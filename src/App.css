@@ -302,10 +302,13 @@ body {
   color: #fff;
 }
 
+.mbron {
+  margin: 8px 0px 12px 16px;
+}
+
 .bron {
   background: #1c6bd3;
   color: #fff;
-  margin: 8px 0px 12px 16px;
   padding: 9px 16px;
   border-radius: 4px;
   border: none;

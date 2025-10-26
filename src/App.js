@@ -6,6 +6,9 @@ import AutoPage from './pages/Auto';
 import MotoPage from './pages/Moto';
 import RealtyPage from './pages/Realty';
 import TourPage from './pages/Tour';
+import AdminPage from './pages/Admin';
+import EditCard from './pages/EditCard';
+import CreateCard from './pages/CreateCard';
 import tour from './icons/tour.png'
 import home from './icons/home.png'
 import moto from './icons/moto.png'
@@ -218,7 +221,7 @@ function App() {
   };
 
   // Если мы на странице деталки, выводим роуты для страниц и не показываем главную
-  if (location.pathname !== '/') {
+  if (location.pathname !== '/' && !location.pathname.startsWith('/admin')) {
     return (
       <Routes>
         <Route path="/auto/:id" element={<AutoPage />} />
@@ -229,12 +232,25 @@ function App() {
     );
   }
 
+  // Роуты для админ-панели
+  if (location.pathname.startsWith('/admin')) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/edit/:id" element={<EditCard />} />
+        <Route path="/admin/create" element={<CreateCard />} />
+      </Routes>
+    );
+  }
+
   return (
     <div className="App">
-      <div
-        className='city-select'
-        style={{ position: 'relative', width: 'fit-content', padding: '16px 18px' }}
-      >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px' }}>
+
+        <div
+          className='city-select'
+          style={{ position: 'relative', width: 'fit-content', padding: 0 }}
+        >
         <button
           onClick={() => setIsCityOpen((open) => !open)}
           className='city'
@@ -269,6 +285,7 @@ function App() {
             ))}
           </div>
         )}
+        </div>
       </div>
       <div className='types'>
         {types.map((t, index) =>
@@ -665,7 +682,7 @@ function App() {
                     </p>
                   )}
 
-                  <button className='bron'>
+                  <button className='bron mbron'>
                     {type === 'Недвижимость' ? 'Записаться на просмотр' : 'Забронировать'}
                   </button>
                 </div>
