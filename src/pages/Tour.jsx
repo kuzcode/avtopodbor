@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
 import { databases, DATABASE_ID, COLLECTION_ID } from '../appwrite';
 import './Doc.css'
 
@@ -8,6 +9,17 @@ export default function TourPage() {
   const [doc, setDoc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
+  const [justDate, setJustDate] = useState(null)
+  const [searchParams] = useSearchParams();
+
+
+  useEffect(() => {
+    const datepar = searchParams.get('justDate');
+
+    if (datepar) {
+      setJustDate(new Date(datepar));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const load = async () => {
@@ -34,49 +46,63 @@ export default function TourPage() {
         <h2 style={{ margin: '12px 0' }} className='docname'>{doc.name}</h2>
         <p>{doc.description}</p>
 
-        {/* Информация о цене */}
-        {doc.price && (
-          <div className="price-calculation-section" style={{
-            marginTop: 20,
-            padding: 0,
-          }}>
-            <h3 style={{ margin: '0 0 12px 0', fontSize: '18px' }}>Стоимость</h3>
-            <p className='price-calculation' style={{
-              fontSize: '16px',
-              margin: 0,
-              fontWeight: 'bold'
-            }}>
-              {parseFloat(doc.price).toLocaleString('ru-RU')}฿/человек
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ margin: '12px 0 12px 0', fontSize: '18px' }}>Комментарий</h3>
-            <textarea rows={3} value={comment} onChange={(e) => {setComment(e.target.value)}} />
-
-            <button className='bron' style={{ marginTop: 16, marginLeft: 0 }}
-              onClick={() => {
-                const botToken = "8221206378:AAEcA2xJvfokMJy8gBrWpqiMn4gXsRpjCHw";
-                const chatId = "5864245473";
-                const message = `Заявка на экскурсию: ${doc.name}\nСтоимость: ${parseFloat(doc.price).toLocaleString('ru-RU')}฿/человек\nКомментарий: ${comment}`;
-                const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-                fetch(url)
-                  .then(response => response.json())
-                  .then(data => {
-                    alert('Заявка отправлена!');
-                  })
-                  .catch(error => {
-                    console.error('Ошибка при отправке сообщения:', error);
-                  });
-              }}
-            >
-              Забронировать
-            </button>
-            </div>
+        <div
+          style={{ marginBottom: 12, marginRight: 24 }}
+        >
+          <label>Дата</label>
+          <DatePicker
+            selected={justDate}
+            onChange={(date) => setJustDate(date)}
+            selectsStart
+            placeholderText="Выберите дату"
+            className="date-picker"
+            dateFormat="dd.MM.yyyy"
+          />
           </div>
-        )}
-      </div>
-    </div >
-  );
+
+          {/* Информация о цене */}
+          {doc.price && (
+            <div className="price-calculation-section" style={{
+              marginTop: 20,
+              padding: 0,
+            }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: '18px' }}>Стоимость</h3>
+              <p className='price-calculation' style={{
+                fontSize: '16px',
+                margin: 0,
+                fontWeight: 'bold'
+              }}>
+                {parseFloat(doc.price).toLocaleString('ru-RU')}฿/человек
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ margin: '12px 0 12px 0', fontSize: '18px' }}>Комментарий</h3>
+                <textarea rows={3} value={comment} onChange={(e) => { setComment(e.target.value) }} />
+
+                <button className='bron' style={{ marginTop: 16, marginLeft: 0 }}
+                  onClick={() => {
+                    const botToken = "8221206378:AAEcA2xJvfokMJy8gBrWpqiMn4gXsRpjCHw";
+                    const chatId = "5864245473";
+                    const message = `Заявка на экскурсию: ${doc.name}\nДата: ${justDate?.toLocaleDateString('ru-RU')}\nСтоимость: ${parseFloat(doc.price).toLocaleString('ru-RU')}฿/человек\nКомментарий: ${comment}`;
+                    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+                    fetch(url)
+                      .then(response => response.json())
+                      .then(data => {
+                        alert('Заявка отправлена!');
+                      })
+                      .catch(error => {
+                        console.error('Ошибка при отправке сообщения:', error);
+                      });
+                  }}
+                >
+                  Забронировать
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div >
+      );
 }
 
 

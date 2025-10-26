@@ -38,23 +38,24 @@ function App() {
   const [type, setType] = useState('Авто');
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Состояния для календаря
+  const [justDate, setJustDate] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  
+
   // Состояния для фильтров
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
   const [carType, setCarType] = useState(''); // '' - все, 'sedan' - седан, 'crossover' - кроссовер
-  
+
   // Состояния для недвижимости
   const [realtyPeriod, setRealtyPeriod] = useState(''); // '' - не выбрано, 'calendar' - календарь, '6months' - 6 месяцев, 'year' - год
   const [homeClass, setHomeClass] = useState(''); // '' - все, 'standard' - стандарт, 'max' - макси
-  
+
   // Состояния для экскурсий
   const [tourType, setTourType] = useState(''); // '' - все, 'islands' - острова, 'quadro' - квадро, 'hydro' - гидроциклы, 'enduro' - эндуро
-  
+
   // Функция для расчета количества дней между датами
   const calculateDays = () => {
     if (!startDate || !endDate) return 0;
@@ -62,7 +63,7 @@ function App() {
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
     return daysDiff > 0 ? daysDiff : 0;
   };
-  
+
   // Функция для расчета общей стоимости
   const calculateTotalPrice = (pricePerDay) => {
     const days = calculateDays();
@@ -113,12 +114,12 @@ function App() {
     try {
       setLoading(true);
       console.log(`Загрузка данных для города: ${cityValue}`);
-      
+
       // Загружаем все документы для выбранного города
       const allDocuments = await fetchAllDocuments(cityValue);
       setDocuments(allDocuments);
       setLoading(false);
-      
+
       console.log('Установлены документы:', allDocuments);
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
@@ -142,18 +143,18 @@ function App() {
   const getFilteredDocuments = () => {
     const selectedType = types.find(t => t.name === type);
     if (!selectedType) return documents;
-    
+
     const filtered = documents.filter(doc => {
       // Проверяем тип
       const docType = parseInt(doc.type);
       const selectedTypeValue = selectedType.value;
       const typeMatch = docType === selectedTypeValue;
-      
+
       // Проверяем город
       const docCity = parseInt(doc.city);
       const selectedCityValue = city.value;
       const cityMatch = docCity === selectedCityValue;
-      
+
       // Проверяем цену (для авто, мотоциклов, недвижимости и экскурсий)
       let priceMatch = true;
       if ((type === 'Авто' || type === 'Мото' || type === 'Недвижимость' || type === 'Экскурсия') && doc.price !== undefined && doc.price !== null) {
@@ -161,7 +162,7 @@ function App() {
         if (priceFrom && !isNaN(parseFloat(priceFrom)) && docPrice < parseFloat(priceFrom)) priceMatch = false;
         if (priceTo && !isNaN(parseFloat(priceTo)) && docPrice > parseFloat(priceTo)) priceMatch = false;
       }
-      
+
       // Проверяем тип автомобиля (только для авто)
       let carTypeMatch = true;
       if (type === 'Авто' && carType && doc.carType !== undefined && doc.carType !== null) {
@@ -169,7 +170,7 @@ function App() {
         if (carType === 'sedan' && docCarType !== 0) carTypeMatch = false;
         if (carType === 'crossover' && docCarType !== 1) carTypeMatch = false;
       }
-      
+
       // Проверяем класс недвижимости (только для недвижимости)
       let homeClassMatch = true;
       if (type === 'Недвижимость' && homeClass && doc.homeClass !== undefined && doc.homeClass !== null) {
@@ -177,7 +178,7 @@ function App() {
         if (homeClass === 'standard' && docHomeClass !== 0) homeClassMatch = false;
         if (homeClass === 'max' && docHomeClass !== 1) homeClassMatch = false;
       }
-      
+
       // Проверяем тип экскурсии (только для экскурсий)
       let tourTypeMatch = true;
       if (type === 'Экскурсия' && tourType && doc.tourType !== undefined && doc.tourType !== null) {
@@ -187,9 +188,9 @@ function App() {
         if (tourType === 'hydro' && docTourType !== 2) tourTypeMatch = false;
         if (tourType === 'enduro' && docTourType !== 3) tourTypeMatch = false;
       }
-      
+
       const finalMatch = typeMatch && cityMatch && priceMatch && carTypeMatch && homeClassMatch && tourTypeMatch;
-      
+
       // Отладочная информация
       if (type === 'Авто' || type === 'Мото' || type === 'Недвижимость' || type === 'Экскурсия') {
         console.log('Фильтрация документа:', {
@@ -213,10 +214,10 @@ function App() {
           finalMatch: finalMatch
         });
       }
-      
+
       return finalMatch;
     });
-    
+
     return filtered;
   };
 
@@ -251,40 +252,40 @@ function App() {
           className='city-select'
           style={{ position: 'relative', width: 'fit-content', padding: 0 }}
         >
-        <button
-          onClick={() => setIsCityOpen((open) => !open)}
-          className='city'
-        >
+          <button
+            onClick={() => setIsCityOpen((open) => !open)}
+            className='city'
+          >
             <img
               src={pin}
               className='pin'
               alt="Местоположение"
             />
-          <p>{city.name}</p>
-        </button>
-        {isCityOpen && (
-          <div className='citySel'>
-            {cities.map((c) => (
-              <div
-                key={c}
-                onClick={() => {
-                  setCity(c);
-                  setIsCityOpen(false);
-                }}
-                style={{
-                  padding: '6px 20px 6px 12px',
-                  background: c.name === city.name ? '#1c6bd3' : 'transparent',
-                  color: c.name === city.name ? '#fff' : '#000'
-                }}
-              >
-                <p style={{
-                  margin: 0,
-                  position: 'relative'
-                }}>{c.name}</p>
-              </div>
-            ))}
-          </div>
-        )}
+            <p>{city.name}</p>
+          </button>
+          {isCityOpen && (
+            <div className='citySel'>
+              {cities.map((c) => (
+                <div
+                  key={c}
+                  onClick={() => {
+                    setCity(c);
+                    setIsCityOpen(false);
+                  }}
+                  style={{
+                    padding: '6px 20px 6px 12px',
+                    background: c.name === city.name ? '#1c6bd3' : 'transparent',
+                    color: c.name === city.name ? '#fff' : '#000'
+                  }}
+                >
+                  <p style={{
+                    margin: 0,
+                    position: 'relative'
+                  }}>{c.name}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className='types'>
@@ -303,7 +304,7 @@ function App() {
           </div>
         )}
       </div>
-      
+
       {/* Календарь и фильтры для авто */}
       {type === 'Авто' && (
         <div className="auto-filters">
@@ -339,7 +340,7 @@ function App() {
               </div>
             </div>
           </div>
-          
+
           {/* Фильтр по цене */}
           <div className="price-filter">
             <div className="price-inputs">
@@ -365,7 +366,7 @@ function App() {
               </div>
             </div>
           </div>
-          
+
           {/* Фильтр по типу автомобиля */}
           <div className="car-type-filter">
             <div className="car-type-options">
@@ -421,7 +422,7 @@ function App() {
               </div>
             </div>
           </div>
-          
+
           {/* Фильтр по цене */}
           <div className="price-filter">
             <div className="price-inputs">
@@ -512,7 +513,7 @@ function App() {
               </div>
             </div>
           )}
-          
+
           {/* Фильтр по цене */}
           <div className="price-filter">
             <div className="price-inputs">
@@ -538,7 +539,7 @@ function App() {
               </div>
             </div>
           </div>
-          
+
           {/* Фильтр по классу недвижимости */}
           <div className="home-class-filter">
             <div className="home-class-options">
@@ -562,6 +563,19 @@ function App() {
       {/* Фильтры для экскурсий */}
       {type === 'Экскурсия' && (
         <div className="auto-filters">
+          <div
+            style={{ marginBottom: 12, marginRight: 24 }}
+          >
+            <label>Дата</label>
+            <DatePicker
+              selected={justDate}
+              onChange={(date) => setJustDate(date)}
+              selectsStart
+              placeholderText="Выберите дату"
+              className="date-picker"
+              dateFormat="dd.MM.yyyy"
+            />
+          </div>
           {/* Фильтр по цене */}
           <div className="price-filter">
             <div className="price-inputs">
@@ -587,7 +601,7 @@ function App() {
               </div>
             </div>
           </div>
-          
+
           {/* Фильтр по типу экскурсии */}
           <div className="tour-type-filter">
             <div className="tour-type-options">
@@ -619,43 +633,43 @@ function App() {
           </div>
         </div>
       )}
-      
+
       {/* Отображение документов */}
       <div className='documents-section'>
         {loading ? (
           <p>Загрузка...</p>
         ) : (
           <div className='documents-list'>
-            <p style={{fontSize: '14px', color: '#666', margin: '0 0 8px 0'}}>
+            <p style={{ fontSize: '14px', color: '#666', margin: '0 0 8px 0' }}>
               Найдено: {getFilteredDocuments().length}
             </p>
             {getFilteredDocuments().map((doc, index) => {
               const days = calculateDays();
               const totalPrice = calculateTotalPrice(doc.price);
-              
+
               return (
                 <div
                   key={doc.$id || index}
                   className='doc'
-                onClick={() => {
-                  const t = parseInt(doc.type);
-                  const paths = ['auto', 'moto', 'realty', 'tour'];
-                  const base = paths[t] || 'auto';
-                  
-                  // Передаем даты через URL параметры
-                  const params = new URLSearchParams();
-                  if (startDate) params.append('startDate', startDate.toISOString());
-                  if (endDate) params.append('endDate', endDate.toISOString());
-                  
-                  // Для недвижимости передаем выбранный период
-                  if (type === 'Недвижимость' && realtyPeriod) {
-                    params.append('realtyPeriod', realtyPeriod);
-                  }
-                  
-                  const queryString = params.toString();
-                  const url = `/${base}/${doc.$id}${queryString ? `?${queryString}` : ''}`;
-                  navigate(url);
-                }}
+                  onClick={() => {
+                    const t = parseInt(doc.type);
+                    const paths = ['auto', 'moto', 'realty', 'tour'];
+                    const base = paths[t] || 'auto';
+
+                    // Передаем даты через URL параметры
+                    const params = new URLSearchParams();
+                    if (startDate) params.append('startDate', startDate.toISOString());
+                    if (endDate) params.append('endDate', endDate.toISOString());
+
+                    // Для недвижимости передаем выбранный период
+                    if (type === 'Недвижимость' && realtyPeriod) {
+                      params.append('realtyPeriod', realtyPeriod);
+                    }
+
+                    const queryString = params.toString();
+                    const url = `/${base}/${doc.$id}${queryString ? `?${queryString}` : ''}`;
+                    navigate(url);
+                  }}
                   style={{ cursor: 'pointer' }}
                 >
                   <img src={doc.img} alt={doc.name} />
